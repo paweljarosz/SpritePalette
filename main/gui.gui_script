@@ -1,0 +1,33 @@
+local max_index = 8
+local max_count = 8
+local LMB = hash("LMB")
+local RMB = hash("RMB")
+
+function init(self)
+	msg.post(".", "acquire_input_focus")
+	msg.post("@render:", "use_fixed_projection", { near = -1, far = 1, zoom = 3 })
+	self.index = 0
+	self.count = 0
+	self.label = gui.get_node("text")
+end
+
+local function cycle(value, max)
+	value = value + 1
+	if value > max then value = 1 end
+	return value
+end
+
+function on_input(self, action_id, action)
+	if action.pressed then
+		if 	action_id == LMB then
+			self.index = cycle(self.index, max_index)
+			model.set_constant("/palette_changer#model", "params", vmath.vector4(self.index, self.count, 0, 0))
+			gui.set_text(self.label, "Index = "..tostring(self.index).." Count = "..tostring(self.count))
+		elseif action_id == RMB then
+			self.count = cycle(self.count, max_count)
+			model.set_constant("/palette_changer#model", "params", vmath.vector4(self.index, self.count, 0, 0))
+			gui.set_text(self.label, "Index = "..tostring(self.index).." Count = "..tostring(self.count))
+		end
+
+	end
+end
